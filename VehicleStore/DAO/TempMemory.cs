@@ -39,12 +39,29 @@ namespace VehicleStore.DAO
         {
             bool flag = false;
             //before adding vehicle record, check if there is any existing record
-            if (!checkIfVehicleExists(input.Id))
+            if (!checkIfVehicleExists(input.Id) && checkvalidation(input))
             {
                 TempMemory.VehicleDB.Add(input);
                 return true;
             }
             return flag;
+        }
+
+        //Check if the Make and Model are not-null. Also year must be between 1950 - 2050
+        private bool checkvalidation(Vehicle input)
+        {
+            if (input.Make != null && input.Model != null && checkYear(input.Year))
+            {
+                return true;
+            }
+            else return false;
+        }
+
+        //Check if year in the range of 1950-2050
+        private bool checkYear(int year)
+        {
+            if (year >= 1950 && year <= 2050) return true;
+            else return false;
         }
 
         //Delete a vehicle record
@@ -55,6 +72,20 @@ namespace VehicleStore.DAO
             if (vehicle != null) { VehicleDB.Remove(vehicle); return true; }
             else return false;
             
+        }
+
+        //Update the vehicle details 
+        public bool updateVehicleDetails(Vehicle input)
+        {
+            var vehicle = VehicleDB.Single(item => item.Id == input.Id);
+            if (vehicle != null)
+            {
+                vehicle.Year = input.Year;
+                vehicle.Make = input.Make;
+                vehicle.Model = input.Model;
+                return true;
+            }
+            else return false;
         }
 
         //Check if any vehicle record exists with the same ID. Return true if exists.

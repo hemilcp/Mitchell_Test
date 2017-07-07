@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Cors;
 using VehicleStore.DAO;
+using VehicleStore.Entity;
 using VehicleStore.Models;
 
 namespace VehicleStore.Controllers
@@ -26,20 +27,25 @@ namespace VehicleStore.Controllers
 
         DAO.TempMemory db = new TempMemory();
 
+
         [HttpPost]
-        public string AddVehicleDetails(Vehicle input)
+        public HttpResponseMessage AddVehicleDetails(Vehicle input)
         {
             var check = db.addNewVehicleDetails(input);
-            if (check) return "Vehicle Details saved successfully!";
-            else return "A record with same Id exists!";
+            if (check) return new PersistObject().returnHTTP("Vehicle Details saved successfully!");
+            else return new PersistObject().returnHTTP("A record with same Id exists!"); 
         }
+
+
         [HttpGet]
-        public IEnumerable<Vehicle> GetAllVehiclesDetails()
+        public HttpResponseMessage GetAllVehiclesDetails()
         {
-            return db.getAllVehicleList();
+            return new PersistObject().returnHTTP(db.getAllVehicleList());
 
         }
 
+
+        // Alternatively we can also return IHttpActionResult instead of HttpResonseMessage
         public IHttpActionResult GetVehicleDetails(int id)
         {
             var vehicle = db.getVehicleDetails(id);
@@ -49,18 +55,19 @@ namespace VehicleStore.Controllers
         }
 
         [HttpDelete]
-        public string DeleteVehicleDetails(Vehicle input)
+        public HttpResponseMessage DeleteVehicleDetails(Vehicle input)
         {
             var check = db.deleteVehicleDetails(input);
-            if (check) return "Vehicle details deleted successfully!";
-            else return "No record exists with such details!";   
+            if (check) return new PersistObject().returnHTTP("Vehicle details deleted successfully!");
+            else return new PersistObject().returnHTTP("No record exists with such details!");   
         }
 
         [HttpPut]
-        public string UpdateVehicleDetails(string Name, String Id)
+        public HttpResponseMessage UpdateVehicleDetails(Vehicle input)
         {
-            return "Vehicle details Updated with Name " + Name + " and Id " + Id;
-
+            var check = db.updateVehicleDetails(input);
+            if (check) return new PersistObject().returnHTTP("Vehicle details Updated with Id " + input.Id);
+            else return new PersistObject().returnHTTP("Cannot update the record. maybe no record exist with such Id!");
         }
 
     }
